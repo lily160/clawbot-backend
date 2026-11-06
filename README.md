@@ -87,11 +87,10 @@ mvn clean install -DskipTests
 
 ### 2. 配置环境变量或本地配置
 
-推荐先复制模板：
+先在 `bot/src/main/resources/` 准备本地 `application.yml`，配置 MySQL 数据源及所需的运行参数。项目会从本地配置或环境变量读取密钥。使用本地配置时，可以复制密钥模板：
 
 ```powershell
-cd bot\src\main\resources
-copy application-local.yml.example application-local.yml
+Copy-Item bot/src/main/resources/application-local.yml.example bot/src/main/resources/application-local.yml
 ```
 
 或者直接设置环境变量：
@@ -126,7 +125,7 @@ mvn spring-boot:run
 
 | 文件 | 用途 |
 |------|------|
-| `bot/src/main/resources/application.yml` | 默认运行配置 |
+| `bot/src/main/resources/application.yml` | 本地运行配置（Git 忽略） |
 | `bot/src/main/resources/application-local.yml` | 本地密钥与个人配置（不要提交） |
 | `bot/src/main/resources/application-local.yml.example` | 本地配置模板 |
 

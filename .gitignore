@@ -18,6 +18,7 @@ logs/
 *.sqlite3
 
 # Local config
+/bot/src/main/resources/application.yml
 application-local.yml
 application-*.local.yml
 .env
