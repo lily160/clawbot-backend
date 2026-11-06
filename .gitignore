@@ -1,0 +1,45 @@
+# Build
+target/
+**/target/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.cursor/
+
+# Runtime data
+data/
+logs/
+*.log
+*.pid
+*.db
+*.sqlite
+*.sqlite3
+
+# Local config
+application-local.yml
+application-*.local.yml
+.env
+
+# Node
+node_modules/
+package.json
+package-lock.json
+
+# Qdrant
+qdrant/
+
+# OS
+.DS_Store
+Thumbs.db
+/docs/ClawBot健康管家-10天排期.md
+/健康管家项目汇报.md
+/docs/健康管家项目汇报材料.md
+
+# Temp scripts
+generate-report*.js
+
+# Personal docs
+实习证明.docx
+*.docx

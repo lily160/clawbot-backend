@@ -1,0 +1,197 @@
+{
+  "categories": [
+    {
+      "key": "child",
+      "label": "儿童基础体检套餐",
+      "description": "适用于 0-6 岁婴幼儿与学龄前儿童，重点覆盖生长发育、营养、视力听力与常见先天性问题",
+      "minAge": 0,
+      "maxAge": 6,
+      "defaultItems": [
+        "一般检查（身高、体重、头围、营养评估）",
+        "血常规",
+        "尿常规",
+        "肝功能（ALT、AST）",
+        "腹部B超（肝胆胰脾肾）",
+        "骨密度/维生素D检测",
+        "视力筛查",
+        "听力筛查",
+        "微量元素检测",
+        "发育行为评估"
+      ],
+      "conditionalItems": [
+        {"condition": "family=肥胖", "items": ["血糖", "血脂四项"]},
+        {"condition": "family=糖尿病", "items": ["糖化血红蛋白"]},
+        {"condition": "慢性病史包含贫血", "items": ["血清铁蛋白"]}
+      ]
+    },
+    {
+      "key": "teen",
+      "label": "青少年基础体检套餐",
+      "description": "适用于 7-17 岁儿童青少年，覆盖生长发育、视力与脊柱等常见问题",
+      "minAge": 7,
+      "maxAge": 17,
+      "defaultItems": [
+        "一般检查（身高、体重、BMI、血压、视力）",
+        "血常规",
+        "尿常规",
+        "肝功能（ALT、AST）",
+        "肾功能（肌酐、尿素氮）",
+        "空腹血糖",
+        "心电图",
+        "腹部B超（肝胆胰脾）",
+        "眼科检查（视力、屈光、眼底）",
+        "脊柱侧弯筛查"
+      ],
+      "conditionalItems": [
+        {"condition": "慢性病史包含高血压或家族高血压史", "items": ["动态血压监测", "心脏彩超"]},
+        {"condition": "慢性病史包含糖尿病或家族糖尿病史", "items": ["糖化血红蛋白", "餐后2小时血糖"]},
+        {"condition": "bmi>=24&&bmi<28", "items": ["血脂四项", "空腹血糖"]},
+        {"condition": "bmi>=28", "items": ["血脂四项", "空腹血糖", "肝脏B超（脂肪肝筛查）"]},
+        {"condition": "lifestyle=night_shift", "extraItems": "建议关注睡眠与情绪，必要时咨询儿童心理门诊"},
+        {"condition": "性别为女", "extraItems": "建议咨询儿科/青春期门诊进行生长发育评估"}
+      ]
+    },
+    {
+      "key": "young_adult",
+      "label": "青年基础体检套餐",
+      "description": "适用于 40 岁以下无特殊病史的青年人群",
+      "minAge": 18,
+      "maxAge": 39,
+      "defaultItems": [
+        "一般检查（身高、体重、BMI、血压）",
+        "血常规（全血细胞计数）",
+        "尿常规",
+        "肝功能（ALT、AST）",
+        "肾功能（肌酐、尿素氮）",
+        "空腹血糖",
+        "血脂四项（总胆固醇、甘油三酯、HDL-C、LDL-C）",
+        "心电图",
+        "胸部X线（正位）",
+        "腹部B超（肝胆胰脾）"
+      ],
+      "conditionalItems": [
+        {"condition": "慢性病史包含高血压或家族高血压史", "items": ["动态血压监测", "眼底检查", "心脏彩超"]},
+        {"condition": "慢性病史包含糖尿病或家族糖尿病史", "items": ["糖化血红蛋白", "餐后2小时血糖", "尿微量白蛋白"]},
+        {"condition": "bmi>=24&&bmi<28", "items": ["空腹血糖", "血脂四项"]},
+        {"condition": "bmi>=28", "items": ["空腹血糖", "血脂四项", "肝脏B超（脂肪肝筛查）"]},
+        {"condition": "smoker==true", "items": ["肺功能检测"]},
+        {"condition": "drinker==true", "items": ["GGT", "肝脏B超"]},
+        {"condition": "family=糖尿病", "items": ["糖化血红蛋白"]},
+        {"condition": "lifestyle=sedentary", "items": ["颈椎X线", "腰椎X线"]},
+        {"condition": "lifestyle=outdoor", "items": ["皮肤科检查"]},
+        {"condition": "lifestyle=night_shift", "items": ["甲状腺B超", "心理健康筛查"]},
+        {"condition": "性别为女", "extraItems": "建议加做妇科检查及乳腺B超"}
+      ]
+    },
+    {
+      "key": "middle_aged",
+      "label": "中老年深度筛查套餐",
+      "description": "适用于 40-59 岁中年人，覆盖三高、心脑血管与肿瘤早期筛查",
+      "minAge": 40,
+      "maxAge": 59,
+      "defaultItems": [
+        "一般检查（身高、体重、BMI、血压）",
+        "血常规",
+        "尿常规",
+        "肝功能全项",
+        "肾功能（肌酐、尿素氮、尿酸）",
+        "空腹血糖",
+        "血脂四项",
+        "糖化血红蛋白",
+        "心电图",
+        "胸部CT（低剂量）",
+        "腹部B超（肝胆胰脾双肾）",
+        "甲状腺B超"
+      ],
+      "conditionalItems": [
+        {"condition": "慢性病史包含高血压", "items": ["动态血压监测", "眼底检查", "颈动脉B超", "心脏彩超", "同型半胱氨酸"]},
+        {"condition": "慢性病史包含糖尿病", "items": ["餐后2小时血糖", "胰岛素释放试验", "尿微量白蛋白/肌酐比值", "下肢血管B超", "眼底检查"]},
+        {"condition": "慢性病史包含高血脂", "items": ["脂蛋白(a)", "载脂蛋白A1/B", "颈动脉B超"]},
+        {"condition": "慢性病史包含冠心病或脑卒中史", "items": ["心脏彩超", "冠脉CT血管成像（遵医嘱）", "颈动脉B超", "动态心电图"]},
+        {"condition": "bmi>=24&&bmi<28", "items": ["同型半胱氨酸", "空腹血糖"]},
+        {"condition": "bmi>=28", "items": ["同型半胱氨酸", "肝脏B超（脂肪肝评估）", "睡眠呼吸暂停筛查"]},
+        {"condition": "smoker==true", "items": ["肺功能检测", "低剂量胸部CT（遵医嘱）"]},
+        {"condition": "drinker==true", "items": ["GGT", "肝脏B超"]},
+        {"condition": "family=冠心病", "items": ["颈动脉B超", "心脏彩超"]},
+        {"condition": "family=肿瘤", "items": ["肿瘤标志物（CEA、AFP）"]},
+        {"condition": "lifestyle=sedentary", "items": ["颈椎X线", "腰椎X线", "颈动脉B超"]},
+        {"condition": "lifestyle=outdoor", "items": ["皮肤科检查", "眼科检查"]},
+        {"condition": "lifestyle=night_shift", "items": ["甲状腺B超"]},
+        {"condition": "性别为男且年龄≥45", "extraItems": "建议加查前列腺特异性抗原(PSA)"},
+        {"condition": "性别为女", "extraItems": "建议加做乳腺B超/钼靶及妇科检查"}
+      ]
+    },
+    {
+      "key": "elderly",
+      "label": "老年深度体检套餐",
+      "description": "适用于 60 岁以上老年人，突出心脑血管、骨关节、认知功能与肿瘤筛查",
+      "minAge": 60,
+      "maxAge": 100,
+      "defaultItems": [
+        "一般检查（身高、体重、BMI、血压）",
+        "血常规",
+        "尿常规",
+        "肝功能全项",
+        "肾功能（肌酐、尿素氮、尿酸）",
+        "空腹血糖",
+        "血脂四项",
+        "糖化血红蛋白",
+        "心电图",
+        "胸部CT（低剂量）",
+        "腹部B超（肝胆胰脾双肾）",
+        "甲状腺B超",
+        "骨密度检测",
+        "认知功能筛查（MMSE）",
+        "听力检查",
+        "视力检查（眼底）",
+        "前列腺B超（男）/ 妇科B超（女）"
+      ],
+      "conditionalItems": [
+        {"condition": "慢性病史包含高血压", "items": ["动态血压监测", "眼底检查", "颈动脉B超", "心脏彩超", "同型半胱氨酸"]},
+        {"condition": "慢性病史包含糖尿病", "items": ["餐后2小时血糖", "胰岛素释放试验", "尿微量白蛋白/肌酐比值", "下肢血管B超", "眼底检查"]},
+        {"condition": "慢性病史包含高血脂", "items": ["脂蛋白(a)", "载脂蛋白A1/B", "颈动脉B超"]},
+        {"condition": "慢性病史包含冠心病或脑卒中史", "items": ["心脏彩超", "冠脉CT血管成像（遵医嘱）", "颈动脉B超", "动态心电图"]},
+        {"condition": "bmi>=24&&bmi<28", "items": ["颈动脉B超", "同型半胱氨酸"]},
+        {"condition": "bmi>=28", "items": ["颈动脉B超", "同型半胱氨酸", "肝脏B超（脂肪肝评估）", "睡眠呼吸暂停筛查"]},
+        {"condition": "smoker==true", "items": ["肺功能检测", "低剂量胸部CT（遵医嘱）"]},
+        {"condition": "drinker==true", "items": ["GGT", "肝脏弹性成像"]},
+        {"condition": "family=冠心病", "items": ["冠脉CT血管成像（遵医嘱）", "心脏彩超"]},
+        {"condition": "family=肿瘤", "items": ["肿瘤标志物（CEA、AFP）", "胃肠镜检查（遵医嘱）"]},
+        {"condition": "lifestyle=sedentary", "items": ["颈动脉B超", "骨密度检测"]},
+        {"condition": "lifestyle=outdoor", "items": ["皮肤科检查", "眼科检查"]},
+        {"condition": "性别为男且年龄≥45", "extraItems": "建议加查前列腺特异性抗原(PSA)"},
+        {"condition": "性别为女", "extraItems": "建议加做乳腺B超/钼靶及妇科检查"}
+      ]
+    },
+    {
+      "key": "pregnancy",
+      "label": "孕期/备孕专项检查套餐",
+      "description": "适用于备孕期、孕期各阶段女性",
+      "minAge": 18,
+      "maxAge": 50,
+      "defaultItems": [
+        "一般检查（身高、体重、BMI、血压）",
+        "血常规",
+        "尿常规",
+        "肝功能全项",
+        "肾功能",
+        "空腹血糖",
+        "甲状腺功能（TSH、FT3、FT4）",
+        "血型（ABO+Rh）",
+        "传染性疾病筛查（乙肝、梅毒、HIV）",
+        "TORCH优生五项",
+        "妇科B超",
+        "心电图"
+      ],
+      "conditionalItems": [
+        {"condition": "已确认怀孕", "items": ["HCG定量", "孕酮", "早期唐筛/NT检查（孕11-13周）", "中期唐筛/无创DNA（孕16-20周）", "OGTT糖耐量试验（孕24-28周）"]},
+        {"condition": "备孕期", "items": ["叶酸水平检测", "性激素六项", "抗缪勒管激素(AMH)"]},
+        {"condition": "慢性病史包含高血压", "items": ["动态血压监测", "尿蛋白定量", "眼底检查"]},
+        {"condition": "慢性病史包含糖尿病或妊娠糖尿病史", "items": ["糖化血红蛋白", "OGTT糖耐量试验"]},
+        {"condition": "bmi>=28", "items": ["OGTT糖耐量试验（孕24-28周）", "妊娠期高血压监测"]},
+        {"condition": "smoker==true", "extraItems": "建议戒烟：孕期吸烟增加流产、早产与低出生体重风险"},
+        {"condition": "年龄≥35", "extraItems": "建议遗传咨询，考虑羊膜穿刺/绒毛膜活检"}
+      ]
+    }
+  ]
+}

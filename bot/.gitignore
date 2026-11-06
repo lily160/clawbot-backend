@@ -1,0 +1,23 @@
+/target/
+/.idea/
+*.iml
+/data/
+*.log
+*.pid
+*.db
+*.sqlite
+*.sqlite3
+application-local.yml
+application-*.local.yml
+
+# Node
+/node_modules/
+/package.json
+/package-lock.json
+
+# Login QR code
+login-qrcode.png
+
+# OS
+.DS_Store
+Thumbs.db

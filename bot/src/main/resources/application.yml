@@ -1,0 +1,318 @@
+# ============================================================
+# 警告：Cloudbot / iLink Bot 存在封号风险，请务必使用微信【小号】扫码测试！
+# ============================================================
+
+spring:
+  application:
+    name: wechat-cloudbot
+  profiles:
+    active: local
+  main:
+    web-application-type: none
+  datasource:
+    # 账号密码优先看 application-local.yml；也可用环境变量 MYSQL_USER / MYSQL_PASSWORD
+    url: jdbc:mysql://${MYSQL_HOST:127.0.0.1}:${MYSQL_PORT:3306}/${MYSQL_DATABASE:cloudbot}?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: ${MYSQL_USER:root}
+    # 安全提醒：数据库密码必须通过环境变量 MYSQL_PASSWORD 或 application-local.yml 注入，
+    # 严禁在仓库中提交明文默认密码。
+    password: ${MYSQL_PASSWORD:}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  data:
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:}
+      timeout: 3s
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+    out-of-order: true
+
+# ---------- Bot 业务配置 ----------
+cloudbot:
+  auto-reply-text: "我现在有点忙，稍后再陪你聊。"
+  treat-voice-as-text: true
+  # 同一用户连发文字在该窗口内合并成一轮再回复（毫秒）；0=关闭
+  message-coalesce-ms: 5000
+  # 识别新话题并清空旧历史，避免串台；false=始终带着历史聊
+  topic-shift-detection-enabled: true
+  # 识图时仍会下载解密；本开关仅控制是否额外落盘
+  download-image: false
+  media-save-dir: ./data/media
+  # 持久化：对话 type=jdbc → MySQL；登录 auth=file → 本地 JSON
+  persistence:
+    enabled: true
+    type: jdbc
+    auth: file
+    dir: ./data
+  # 文件收发：入站解析 txt/md/docx/xlsx/zip + 出站 send_file / export_document
+  file:
+    enabled: true
+    max-inbound-bytes: 2097152
+    max-prompt-chars: 80000
+    max-outbound-bytes: 1048576
+    max-zip-entries: 40
+    max-zip-entry-bytes: 262144
+    max-xlsx-rows: 500
+    max-xlsx-cols: 30
+  # Agent 工具：默认全开；写入名称可启动时禁用（大小写不敏感），运行期仍可 ToolRegistry.enable 打开
+  tools:
+    disabled: []
+  # 声明式 Skill：启动时扫描 src/skills/*/SKILL.md 并自动注册为 Function Calling 工具
+  skills:
+    enabled: true
+    directory: src/skills
+  # 灵感笔记 → GitHub Gist（saveInspiration）；需 PAT 勾选 gist 权限
+  # $env:GITHUB_GIST_TOKEN="ghp_xxx"
+  gist:
+    token: ${GITHUB_GIST_TOKEN:}
+
+  # SQLite 本地数据库（可选；默认关闭，会话/灵感走主 MySQL 数据源）
+  datasource:
+    enabled: false
+    url: ${CLOUDBOT_SQLITE_URL:jdbc:sqlite:../cloudbot.db}
+  qrcode:
+    # 关闭终端字符二维码，只保存/打开 PNG，避免编码折腾
+    print-ascii: false
+    save-image: true
+    image-path: ./data/login-qrcode.png
+  # 纯趣味开关
+  fun:
+    qrcode-blessing-enabled: false
+    persona-switch-enabled: true
+    joke-enabled: true
+    game-enabled: true
+    luck-enabled: true
+    game-timeout-minutes: 30
+
+# ---------- DeepSeek（主对话 + 意图分流：聊天/天气/联网搜索/生图/生视频 + 识图优化）----------
+# $env:DEEPSEEK_API_KEY="sk-xxx"
+deepseek:
+  enabled: true
+  api-key: ${DEEPSEEK_API_KEY:}
+  base-url: https://api.deepseek.com
+  model: deepseek-v4-flash
+  system-prompt: "你是微信 Cloudbot 助手，回复简洁友好，适合即时消息。用户问有什么功能/你会什么时，调用 list_capabilities 并按结果回答。"
+  vision-refine-prompt: |
+    【图片识图结果】
+    {vision}
+
+    请结合对话上下文，将上述内容优化为简洁友好的微信回复。直接输出最终回复正文，不要解释优化过程。
+  video-refine-prompt: |
+    【视频理解结果】
+    {vision}
+
+    请结合对话上下文，将上述内容优化为简洁友好的微信回复。直接输出最终回复正文，不要解释优化过程。
+  max-history-turns: 30
+  # 模型训练知识大约截止年月；晚于此且像在问事实时会强制联网搜索（第 3 层兜底）
+  knowledge-cutoff: 2025-06
+  connect-timeout-ms: 10000
+  read-timeout-ms: 60000
+  temperature: 0.7
+
+# ---------- 地点检索 / 地理编码（复用 AMAP_API_KEY）----------
+location:
+  enabled: true
+  api-key: ${AMAP_API_KEY:}
+  base-url: https://restapi.amap.com
+  poi-count: 8
+  around-radius-meters: 3000
+  connect-timeout-ms: 10000
+  read-timeout-ms: 15000
+
+# ---------- 网页抓取（browse_url）----------
+browse:
+  enabled: true
+  connect-timeout-ms: 10000
+  read-timeout-ms: 20000
+  max-chars: 6000
+
+# ---------- 高德天气（query_weather → DeepSeek 润色）----------
+# 申请 Web 服务 Key：https://console.amap.com/dev/key/app  →  $env:AMAP_API_KEY="xxx"
+amap:
+  enabled: true
+  api-key: ${AMAP_API_KEY:}
+  base-url: https://restapi.amap.com
+  # base=仅实况；all=预报
+  default-extensions: all
+  connect-timeout-ms: 10000
+  read-timeout-ms: 15000
+  refine-prompt: |
+    【当前日期】
+    {today}
+
+    【高德天气查询结果】
+    {weather}
+
+    【用户问题】
+    {question}
+
+    今天是 {today}。请仅依据上述天气数据回答，禁止使用模型训练记忆编造气温或天气。
+    若结果地点与用户询问的城市明显不符，只说明查不到该城市，禁止改口播报结果里其它城市的天气。
+    用简洁友好的微信口吻直接回答；不要写「根据高德」等套话；可适当给出穿衣/出行提醒。
+
+# ---------- 博查联网搜索（新闻等实时信息 → DeepSeek 润色；天气请用高德）----------
+# 申请 Key：https://open.bochaai.com/  →  $env:BOCHA_API_KEY="xxx"
+bocha:
+  enabled: true
+  api-key: ${BOCHA_API_KEY:}
+  base-url: https://api.bochaai.com/v1
+  freshness: oneWeek
+  summary: true
+  count: 8
+  connect-timeout-ms: 10000
+  read-timeout-ms: 30000
+  refine-prompt: |
+    【当前日期】
+    {today}
+
+    【联网搜索结果】
+    {search}
+
+    【用户问题】
+    {question}
+
+    今天是 {today}。请仅依据上述联网搜索结果回答，禁止使用模型训练记忆或 cutoff 知识。
+    若搜索结果中已有明确冠军、比分、赛果或日期，必须采用；多条冲突时优先较新、较具体的赛果报道。
+    若搜索结果确实没有答案，如实说明未查到；不要自行推断「还没举办/还没开踢」，除非搜索结果明确如此。
+    用简洁友好的微信口吻直接回答；不要写「根据搜索结果」等套话；必要时在末尾附 1～2 个来源标题。
+
+# ---------- 语音 ASR / TTS（复用 DASHSCOPE_API_KEY）----------
+# reply-mode: mirror=用户发语音则回语音附件；always-voice=尽量总回语音；never=只回文字
+# outbound-mode: file=TTS→sendFile 附件（推荐，Clawbot 可用）；voice=尝试语音气泡（常被丢弃）
+voice:
+  asr-enabled: true
+  tts-enabled: true
+  reply-mode: mirror
+  outbound-mode: file
+  also-send-text: false
+  asr-model: qwen3-asr-flash
+  tts-model: qwen3-tts-instruct-flash
+  tts-voice: Cherry
+  tts-language-type: Chinese
+  # 默认人格的语气指令；变身后优先用人格自带指令（见 PersonaCatalog）
+  tts-instructions: "语速适中，语气自然，适合微信短语音回复。"
+  tts-optimize-instructions: true
+  tts-api-base-url: https://dashscope.aliyuncs.com/api/v1
+  # 微信发「自定义音色」后再发音频 → 声音复刻；保留系统音色可「恢复默认音色」
+  voice-clone-enabled: true
+  voice-clone-model: qwen3-tts-vc-2026-01-22
+  voice-clone-pending-ms: 120000
+  voice-clone-min-ms: 5000
+  encode-type: 6
+  sample-rate: 24000
+  connect-timeout-ms: 10000
+  read-timeout-ms: 120000
+
+# ---------- 通义千问 VL（用户发来的图片 / 视频理解）----------
+# $env:DASHSCOPE_API_KEY="sk-xxx"
+# 若 qwen-vl-plus 不支持视频，可改为 qwen-vl-max / qwen2.5-vl-72b-instruct
+qwen:
+  enabled: true
+  api-key: ${DASHSCOPE_API_KEY:}
+  base-url: https://dashscope.aliyuncs.com/compatible-mode/v1
+  model: qwen-plus
+  vision-model: qwen-vl-plus
+  system-prompt: "你负责理解图片与视频内容。"
+  image-prompt: "请详细描述这张图片中的关键信息，便于后续助手回复用户。"
+  video-prompt: "请详细描述这段视频的关键内容与情节，便于后续助手回复用户。"
+  video-fps: 2.0
+  # Base64 上传体积上限（字节），约 12MB；过大请发更短视频
+  max-video-bytes: 12582912
+  max-history-turns: 10
+  connect-timeout-ms: 10000
+  read-timeout-ms: 180000
+  temperature: 0.7
+
+# ---------- 火山方舟（文生图 Seedream / 文生视频 Seedance）----------
+# $env:ARK_API_KEY="xxx"
+# image-model / video-model 填控制台「推理接入点」ID（ep-xxxx）或公开模型名
+volcengine:
+  enabled: true
+  api-key: ${ARK_API_KEY:}
+  base-url: https://ark.cn-beijing.volces.com/api/v3
+  image-model: ${VOLC_IMAGE_MODEL:ep-m-20260718152120-z6dmr}
+  video-model: ${VOLC_VIDEO_MODEL:ep-20260718153716-77shj}
+  image-size: "2K"
+  image-watermark: false
+  video-duration-seconds: 5
+  video-ratio: "16:9"
+  video-poll-interval-ms: 10000
+  video-poll-timeout-ms: 600000
+  connect-timeout-ms: 15000
+  read-timeout-ms: 120000
+
+# ---------- 阿里云 OCR（体检报告识别）----------
+# 方式1: API市场 AppCode
+# $env:ALIYUN_OCR_APPCODE="xxx"
+# 方式2: 官方API AccessKey（优先级更高）
+# $env:ALIYUN_OCR_ACCESS_KEY_ID="xxx"
+# $env:ALIYUN_OCR_ACCESS_KEY_SECRET="xxx"
+health:
+  booking:
+    enabled: false
+    default-recommend-limit: 3
+    mini-program-hint: 请在对应医院小程序内完成最终确认和预约提交。
+    first-hospital:
+      name: "杭州市余杭区第一人民医院"
+      path: "#小程序://杭州市余杭区第一人民医院/FP0BXhWONpZpGKk"
+    second-hospital:
+      name: "余杭区二院"
+      path: ""
+    third-hospital:
+      name: "杭州市余杭区第三人民医院"
+      path: "#小程序://余杭智慧三院/hSTdw7P8PhjCJmb"
+    fallback-mini-program:
+      name: "杭州市互联网医院"
+      path: ""
+  report:
+    aliyun-ocr:
+      app-code: ${ALIYUN_OCR_APPCODE:}
+      access-key-id: ${ALIYUN_OCR_ACCESS_KEY_ID:}
+      access-key-secret: ${ALIYUN_OCR_ACCESS_KEY_SECRET:}
+      endpoint: https://ocr-api.cn-hangzhou.aliyuncs.com
+
+# ---------- ILink SDK ----------
+ilink:
+  connect-timeout-ms: 35000
+  read-timeout-ms: 35000
+  write-timeout-ms: 35000
+  http-max-retries: 3
+  retry-base-delay-ms: 1000
+  retry-max-delay-ms: 10000
+  retry-jitter-enabled: true
+  login-timeout-ms: 180000
+  heartbeat-enabled: true
+  heartbeat-interval-ms: 30000
+  channel-version: "1.0.0"
+  route-tag: ""
+
+# ---------- Agent 循环配置 ----------
+agent:
+  loop:
+    max-rounds: 5
+    timeout-ms: 120000
+  llm:
+    timeout-ms: 60000
+  circuit-breaker:
+    enabled: true
+    failure-threshold: 3
+    half-open-after-ms: 30000
+  retry:
+    max-attempts: 2
+    base-delay-ms: 1000
+
+# ---------- Cron 调度器配置 ----------
+scheduler:
+  pool-size: 4
+  await-termination-seconds: 10
+
+logging:
+  charset:
+    # 统一 UTF-8
+    console: UTF-8
+  level:
+    root: INFO
+    com.github.wechat.cloudbot: INFO
+    com.github.wechat.ilink.sdk: INFO

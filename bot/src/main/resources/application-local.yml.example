@@ -1,0 +1,40 @@
+# 本地密钥模板：复制为 application-local.yml 后填写真实 key，真实 key 不要提交。
+# cp application-local.yml.example application-local.yml
+
+# spring:
+#   datasource:
+#     # 本地 MySQL 账号密码（仓库默认不提供密码，必须在此或环境变量 MYSQL_PASSWORD 中配置）
+#     username: root
+#     password: your-local-password
+
+# deepseek:
+#   api-key: sk-xxx
+
+# amap:
+#   api-key: xxx
+
+# bocha:
+#   api-key: xxx
+
+# qwen:  # 与 voice 共用 DASHSCOPE
+#   api-key: sk-xxx
+
+# voice:
+#   # 使用 qwen.api-key / DASHSCOPE_API_KEY
+
+# volcengine:
+#   api-key: xxx
+#   image-model: ep-xxxx
+#   video-model: ep-xxxx
+
+# health:
+#   report:
+#     ocr:
+#       app-id: xxx
+#       api-key: xxx
+#       api-secret: xxx
+#       endpoint: https://cbm01.cn-huabei-1.xf-yun.com/v1/private/se75ocrbm
+
+# cloudbot:
+#   gist:
+#     token: ghp_xxx   # GitHub PAT，需要勾选 gist 权限；也可用环境变量 GITHUB_GIST_TOKEN
